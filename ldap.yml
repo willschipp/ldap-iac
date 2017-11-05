@@ -1,0 +1,22 @@
+---
+- hosts: all
+  tasks:
+    - name: install prerequisites
+      yum: pkg={{item}} state=installed
+      with_items:
+        - openldap
+        - compat-openldap
+        - openldap-clients
+        - openldap-servers
+        - openldap-servers-sql
+        - openldap-devel
+        - libselinux-python
+
+    - name: ldif
+      copy: src=./src/base.ldif dest=~/base.ldif
+
+    - name: run service
+      command: systemctl start slapd.service
+
+    - name: install ldif
+      command: ldapmodify -Y EXTERNAL -H ldapi:/// -f base.ldif
